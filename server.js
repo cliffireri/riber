@@ -14,7 +14,22 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 //run when client connects
 io.on('connection', socket => {
-    console.log('New Websocket connection')
+    socket.emit('message','Welcome to riber') //emit just to the client connected
+
+    socket.broadcast.emit('message', 'A user has joined the chat'); //emit to all the clients except the client connecting
+
+    //when a user disconnects
+
+    socket.on('disconnect', () => {
+        socket.broadcast.emit('message', 'A user has left the chat')
+    })
+
+    //io.emit() //broadcast to everyone in general
+    //listen for chat messages
+    socket.on('chatMessage', (msg) => {
+        io.emit('message',msg)
+    })
+
 })
 
 const port = process.env.PORT || 3000;
